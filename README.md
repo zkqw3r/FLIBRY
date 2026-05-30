@@ -11,7 +11,7 @@
 </p>
 
 <div align="center">
-  <video src="https://github.com/user/repo/assets/123456/видео.mp4" autoplay loop muted playsinline width="100%"></video>
+  <img src="demonstration.gif" width="60%"></img>
   <p><i>demonstration of work</i></p>
 </div>
 
