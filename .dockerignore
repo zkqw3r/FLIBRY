@@ -1,0 +1,21 @@
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md
+!DEPLOY.md
+
+# Credentials
+credentials.json

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{if .book}}{{.book.Title}}{{else}}Читалка{{end}}</title>
+    <link rel="stylesheet" href="/static/css/reader.css">
+</head>
+<body>
+    {{if .error}}
+    <div style="text-align: center; padding: 50px;">
+        <h2>{{.error}}</h2>
+        <a href="/" style="display: inline-block; margin-top: 20px; color: #60a5fa; text-decoration: none;">На главную</a>
+    </div>
+    {{else}}
+    
+    <div class="loader-overlay" id="loader">
+        <div class="loader-content">
+            <div class="spinner"></div>
+            <div class="loader-text">Загрузка книги...</div>
+        </div>
+    </div>
+    
+    <div class="book-background">
+        <div style="position: absolute; inset: -40px; background-image: url('/cover/{{.book.FlibustaID.String}}'); background-size: cover; background-position: center 35%; background-repeat: no-repeat; filter: blur(60px) brightness(0.4) saturate(1.2) contrast(1.5); transform: scale(1.2); opacity: 0.9;"></div>
+    </div>
+    
+    <div class="reader-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">{{.book.Title}}</div>
+                <div class="sidebar-author">{{.book.Author.String}}</div>
+            </div>
+            <div class="chapter-list">
+                {{range $index, $chapter := .structure.Chapters}}
+                <div class="chapter-item" data-chapter="{{$chapter.Index}}" onclick="loadChapter({{$chapter.Index}})">
+                    <div class="chapter-number">Глава {{$chapter.Index}}</div>
+                    <div class="chapter-title">{{$chapter.Title}}</div>
+                </div>
+                {{end}}
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="top-bar">
+                <button class="glass-btn" onclick="toggleSidebar()">☰</button>
+                <div class="top-bar-title" id="currentChapterTitle">{{if .structure.Chapters}}{{(index .structure.Chapters 0).Title}}{{end}}</div>
+                <a href="/" class="glass-btn">✕</a>
+            </div>
+
+            <div class="reading-area" id="readingArea">
+                <div class="reading-content" id="readingContent">
+                    {{if .structure.Chapters}}
+                    <div class="chapter-header">
+                        <h1>{{(index .structure.Chapters 0).Title}}</h1>
+                    </div>
+                    <div class="chapter-text">{{(index .structure.Chapters 0).Content}}</div>
+                    {{end}}
+                </div>
+            </div>
+
+            <div class="bottom-bar">
+                <button class="nav-btn" id="prevBtn" onclick="prevChapter()">← Назад</button>
+                <div class="progress-info">
+                    <span>Глава <span id="currentChapter">1</span> из <span id="totalChapters">{{len .structure.Chapters}}</span></span>
+                </div>
+                <div class="controls">
+                    <button class="font-btn" onclick="changeFontSize(-2)">A-</button>
+                    <span class="font-size-display" id="fontSizeDisplay">18</span>
+                    <button class="font-btn" onclick="changeFontSize(2)">A+</button>
+                    <span style="width: 1px; height: 24px; background: rgba(255,255,255,0.2); margin: 0 4px;"></span>
+                    <a href="/download/{{.bookID}}" class="download-btn" onclick="startDownload()">Скачать</a>
+                </div>
+                <button class="nav-btn" id="nextBtn" onclick="nextChapter()">Вперёд →</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const bookId = {{.bookID}};
+        const chapters = {{.structure.Chapters | len}};
+        let currentChapter = 1;
+        let fontSize = 18;
+        
+        const chaptersData = [
+            {{range .structure.Chapters}}
+            {
+                index: {{.Index}},
+                title: {{.Title | printf "%q"}},
+                content: {{.Content | printf "%q"}}
+            },
+            {{end}}
+        ];
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 500);
+        });
+
+        const savedChapter = localStorage.getItem('chapter_' + bookId);
+        if (savedChapter) {
+            currentChapter = parseInt(savedChapter);
+            loadChapter(currentChapter);
+        }
+
+        const savedFontSize = localStorage.getItem('fontSize_' + bookId);
+        if (savedFontSize) {
+            fontSize = parseInt(savedFontSize);
+            document.getElementById('readingContent').style.fontSize = fontSize + 'px';
+            document.getElementById('fontSizeDisplay').textContent = fontSize;
+        }
+
+        function loadChapter(chapterNum) {
+            if (chapterNum < 1 || chapterNum > chapters) return;
+            
+            currentChapter = chapterNum;
+            const chapter = chaptersData[chapterNum - 1];
+            
+            document.getElementById('readingContent').innerHTML = `
+                <div class="chapter-header">
+                    <h1>${chapter.title}</h1>
+                </div>
+                <div class="chapter-text">${chapter.content}</div>
+            `;
+            
+            document.getElementById('currentChapterTitle').textContent = chapter.title;
+            document.getElementById('currentChapter').textContent = chapterNum;
+            document.getElementById('readingArea').scrollTop = 0;
+            
+            document.querySelectorAll('.chapter-item').forEach(item => {
+                item.classList.remove('active');
+                if (parseInt(item.dataset.chapter) === chapterNum) {
+                    item.classList.add('active');
+                }
+            });
+            
+            document.getElementById('prevBtn').disabled = chapterNum === 1;
+            document.getElementById('nextBtn').disabled = chapterNum === chapters;
+            
+            localStorage.setItem('chapter_' + bookId, chapterNum);
+
+            fetch(`/api/library/${bookId}/progress`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chapter: chapterNum, total: chapters })
+            }).catch(e => console.log('Не удалось сохранить прогресс на сервере'));
+        }
+
+        function nextChapter() {
+            if (currentChapter < chapters) {
+                loadChapter(currentChapter + 1);
+            }
+        }
+
+        function prevChapter() {
+            if (currentChapter > 1) {
+                loadChapter(currentChapter - 1);
+            }
+        }
+
+        function changeFontSize(delta) {
+            fontSize = Math.max(12, Math.min(32, fontSize + delta));
+            document.getElementById('readingContent').style.fontSize = fontSize + 'px';
+            document.getElementById('fontSizeDisplay').textContent = fontSize;
+            localStorage.setItem('fontSize_' + bookId, fontSize);
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('hidden');
+        }
+
+        if (window.innerWidth <= 768) {
+            document.getElementById('sidebar').classList.add('hidden');
+        }
+
+        document.querySelectorAll('.chapter-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    document.getElementById('sidebar').classList.add('hidden');
+                }
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') prevChapter();
+            if (e.key === 'ArrowRight') nextChapter();
+        });
+
+        loadChapter(currentChapter);
+
+        function startDownload() {
+            const loader = document.getElementById('loader');
+            document.querySelector('.loader-text').textContent = "Скачивание файла (Tor)...";
+            loader.classList.remove('hidden');
+
+            document.cookie = "download_started=; Max-Age=0; path=/";
+            let pollTimer = setInterval(function() {
+                if (document.cookie.indexOf("download_started=1") !== -1) {
+                    loader.classList.add('hidden');
+                    document.cookie = "download_started=; Max-Age=0; path=/";
+                    clearInterval(pollTimer);
+                }
+            }, 500);
+        }
+    </script>
+    {{end}}
+</body>
+</html>

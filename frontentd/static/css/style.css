@@ -1,0 +1,234 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family:
+		-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+		Cantarell, sans-serif;
+	background: linear-gradient(135deg, #1b1f31 0%, #3b274f 100%);
+	min-height: 100vh;
+	padding: 20px;
+}
+
+.container {
+	max-width: 1200px;
+	margin: 0 auto;
+	background: white;
+	padding: 30px;
+	border-radius: 10px;
+	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+	color: #333;
+	margin-bottom: 30px;
+	text-align: center;
+}
+
+.search-box {
+	margin-bottom: 30px;
+}
+
+#search {
+	width: 100%;
+	padding: 15px;
+	font-size: 16px;
+	border: 2px solid #ddd;
+	border-radius: 8px;
+	transition: border-color 0.3s;
+}
+
+#search:focus {
+	outline: none;
+	border-color: #667eea;
+}
+
+.hint {
+	color: #666;
+	font-size: 14px;
+	margin-top: 10px;
+}
+
+.htmx-indicator {
+	display: none;
+	color: #667eea;
+	font-weight: bold;
+	margin-top: 10px;
+}
+
+.htmx-request .htmx-indicator {
+	display: block;
+}
+
+.htmx-request #search {
+	border-color: #667eea;
+	background: #f0f4ff;
+}
+
+.results {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+	gap: 20px;
+}
+
+.book-card {
+	background: #f8f9fa;
+	padding: 20px;
+	border-radius: 8px;
+	transition:
+		transform 0.2s,
+		box-shadow 0.2s;
+}
+
+.book-card:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.book-card img {
+	width: 100%;
+	height: 400px;
+	object-fit: cover;
+	border-radius: 5px;
+	margin-bottom: 15px;
+}
+
+.book-info h3 {
+	color: #333;
+	margin-bottom: 10px;
+	font-size: 18px;
+}
+
+.author {
+	color: #666;
+	margin-bottom: 10px;
+}
+
+.description {
+	color: #888;
+	font-size: 14px;
+	margin-bottom: 15px;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.book-actions {
+	display: flex;
+	gap: 10px;
+}
+
+.btn {
+	padding: 10px 20px;
+	background: #667eea;
+	color: white;
+	text-decoration: none;
+	border-radius: 5px;
+	text-align: center;
+	transition: background 0.3s;
+}
+
+.btn:hover {
+	background: #5568d3;
+}
+
+.btn-secondary {
+	background: #764ba2;
+}
+
+.btn-secondary:hover {
+	background: #63408a;
+}
+
+.no-results {
+	text-align: center;
+	color: #666;
+	padding: 40px;
+}
+
+/* Формы */
+form {
+	max-width: 400px;
+	margin: 0 auto;
+}
+
+input[type="text"],
+input[type="password"] {
+	width: 100%;
+	padding: 12px;
+	margin-bottom: 15px;
+	border: 2px solid #ddd;
+	border-radius: 5px;
+	font-size: 16px;
+}
+
+button[type="submit"] {
+	width: 100%;
+	padding: 12px;
+	background: #667eea;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	font-size: 16px;
+	cursor: pointer;
+	transition: background 0.3s;
+}
+
+button[type="submit"]:hover {
+	background: #5568d3;
+}
+
+/* Читалка */
+.controls {
+	position: fixed;
+	bottom: 20px;
+	left: 50%;
+	transform: translateX(-50%);
+	display: flex;
+	gap: 10px;
+	background: white;
+	padding: 15px;
+	border-radius: 10px;
+	box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+.controls button,
+.controls a {
+	padding: 10px 20px;
+	background: #667eea;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.controls button:hover,
+.controls a:hover {
+	background: #5568d3;
+}
+
+/* Навигация */
+nav {
+	background: white;
+	padding: 15px;
+	margin-bottom: 20px;
+	border-radius: 10px;
+	display: flex;
+	gap: 20px;
+	justify-content: center;
+}
+
+nav a {
+	color: #667eea;
+	text-decoration: none;
+	font-weight: 500;
+}
+
+nav a:hover {
+	color: #5568d3;
+}

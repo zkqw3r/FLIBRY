@@ -1,0 +1,67 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: flbr_postgres
+    environment:
+      POSTGRES_USER: flibusta_user
+      POSTGRES_PASSWORD: flbr
+      POSTGRES_DB: flibusta_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/db/migrations/001_init.sql:/docker-entrypoint-initdb.d/001_init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U flibusta_user -d flibusta_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  tor:
+    build:
+      context: ./tor
+      dockerfile: Dockerfile
+    container_name: flbr_tor
+    ports:
+      - "9050:9050"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "9050"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: flbr_backend
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: 8080
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: flibusta_user
+      DB_PASSWORD: flbr
+      DB_NAME: flibusta_db
+      DB_SSLMODE: disable
+      TOR_PROXY: socks5h://tor:9050
+      FLIBUSTA_URL: http://flibustaongezhld6dibs2dps6vm4nvqg2kp7vgowbu76tzopgnhazqd.onion
+      STORAGE_PATH: /app/storage/books
+      SESSION_SECRET: your_very_secret_key_change_this_in_production
+      TEMPLATES_PATH: /frontentd/templates
+    volumes:
+      - ./storage/books:/app/storage/books
+      - ./frontentd:/frontentd
+      - ./credentials.json:/app/credentials.json:ro
+      - ./token.json:/app/token.json:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      tor:
+        condition: service_started
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

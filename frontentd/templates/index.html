@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLIBRY - Поиск книг</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body>
+    <div class="background"></div>
+    
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="/" class="nav-logo">FLIBRY</a>
+            <div class="nav-links">
+                <a href="/" class="nav-link active">Поиск</a>
+                <a href="/library" class="nav-link">Библиотека</a>
+                <a href="/profile" class="nav-link">Профиль</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="global-loader hidden" id="global-loader">
+        <div class="loader-content">
+            <div class="spinner"></div>
+            <div class="loader-text" id="global-loader-text">Обработка...</div>
+        </div>
+    </div>
+
+    <div class="container" style="padding-top: 120px;">
+        <div class="header">
+            <h1 style="font-size: 56px;">Поиск книг</h1>
+            <p class="subtitle">Найдите любимую книгу</p>
+        </div>
+        
+        <div class="search-box">
+            <div class="search-container">
+                <input type="text" id="search" name="q" placeholder="Название или автор"
+                       hx-get="/search" hx-trigger="keyup changed delay:500ms, search" 
+                       hx-target="#results" hx-indicator="#loading" autocomplete="off">
+                <div id="loading" class="htmx-indicator">Поиск...</div>
+            </div>
+        </div>
+
+        <div id="results" class="results">
+            <div class="empty-state">
+                <div class="empty-state-icon">📚</div>
+                <div class="empty-state-text">Начните вводить название</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('click', function(e) {
+            const readBtn = e.target.closest('.action-read');
+            const downloadBtn = e.target.closest('.action-download');
+            
+            if (!readBtn && !downloadBtn) return;
+
+            const loader = document.getElementById('global-loader');
+            const loaderText = document.getElementById('global-loader-text');
+
+            if (readBtn) {
+                loaderText.textContent = "Загрузка книги...";
+                loader.classList.remove('hidden');
+            } 
+            else if (downloadBtn) {
+                loaderText.textContent = "Скачивание файла...";
+                loader.classList.remove('hidden');
+
+                document.cookie = "download_started=; Max-Age=0; path=/";
+                
+                let attempts = 0;
+                let pollTimer = setInterval(function() {
+                    attempts++;
+                    if (document.cookie.indexOf("download_started=1") !== -1 || attempts > 60) {
+                        loader.classList.add('hidden');
+                        document.cookie = "download_started=; Max-Age=0; path=/";
+                        clearInterval(pollTimer);
+                    }
+                }, 500);
+            }
+        });
+    </script>
+</body>
+</html>

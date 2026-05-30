@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход - FLIBRY</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body>
+    <div class="background"></div>
+    
+    <div class="container" style="min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+        <div class="auth-card">
+            <h1>Вход</h1>
+            <p class="subtitle">Добро пожаловать в FLIBRY</p>
+            
+            <div class="error" id="error"></div>
+            
+            <form hx-post="/login" hx-swap="none">
+                <input type="text" name="username" placeholder="Имя пользователя" required autocomplete="username">
+                <input type="password" name="password" placeholder="Пароль" required autocomplete="current-password">
+                <button type="submit">Войти</button>
+            </form>
+            
+            <p class="footer-text">Нет аккаунта? <a href="/register">Зарегистрироваться</a></p>
+        </div>
+    </div>
+    
+    <script>
+        document.body.addEventListener('htmx:afterRequest', function(evt) {
+            if (evt.detail.successful) {
+                window.location.href = '/';
+            } else {
+                const errorDiv = document.getElementById('error');
+                errorDiv.textContent = 'Неверное имя пользователя или пароль';
+                errorDiv.classList.add('show');
+            }
+        });
+    </script>
+</body>
+</html>

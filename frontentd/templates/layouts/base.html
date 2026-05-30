@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLIBRY Library</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body>
+    <nav>
+        <a href="/">Главная</a>
+        <a href="/library">Библиотека</a>
+        <a href="/profile">Профиль</a>
+        <a href="#" hx-post="/logout" hx-swap="none">Выход</a>
+    </nav>
+    <main>
+        {{template "content" .}}
+    </main>
+</body>
+</html>

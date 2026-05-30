@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация - FLIBRY</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body>
+    <div class="background"></div>
+    
+    <div class="container" style="min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+        <div class="auth-card">
+            <h1>Регистрация</h1>
+            <p class="subtitle">Создайте аккаунт в FLIBRY</p>
+            
+            <div class="error" id="error"></div>
+            
+            <div id="success-message" style="display: none; text-align: center; color: #4ade80; margin-bottom: 20px;">
+                <div style="font-size: 48px; margin-bottom: 16px;">✉️</div>
+                <h3>Регистрация успешна!</h3>
+                <p style="margin-top: 8px; color: rgba(255,255,255,0.7);">Мы отправили письмо с подтверждением на вашу почту. Пожалуйста, перейдите по ссылке в письме.</p>
+            </div>
+
+            <form id="register-form" hx-post="/register" hx-swap="none">
+                <input type="text" name="username" placeholder="Имя пользователя" required minlength="3" autocomplete="username">
+                
+                <input type="email" name="email" placeholder="Email адрес" required autocomplete="email">
+                
+                <input type="password" name="password" placeholder="Пароль" required minlength="6" autocomplete="new-password">
+                <p class="hint" style="margin-top: -8px;">Минимум 6 символов</p>
+                
+                <button type="submit">Зарегистрироваться</button>
+            </form>
+            
+            <p class="footer-text" id="footer-login">Уже есть аккаунт? <a href="/login">Войти</a></p>
+        </div>
+    </div>
+    
+    <script>
+        document.body.addEventListener('htmx:afterRequest', function(evt) {
+            if (evt.detail.successful) {
+                document.getElementById('register-form').style.display = 'none';
+                document.getElementById('footer-login').style.display = 'none';
+                document.getElementById('error').classList.remove('show');
+                document.getElementById('success-message').style.display = 'block';
+            } else {
+                const errorDiv = document.getElementById('error');
+                let errorMsg = 'Ошибка регистрации.';
+                try {
+                    const response = JSON.parse(evt.detail.xhr.response);
+                    if (response.error) errorMsg = response.error;
+                } catch(e) {}
+                
+                errorDiv.textContent = errorMsg;
+                errorDiv.classList.add('show');
+            }
+        });
+    </script>
+</body>
+</html>

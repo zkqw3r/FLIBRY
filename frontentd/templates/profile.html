@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLIBRY - Профиль</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body>
+    <div class="background"></div>
+    
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="/" class="nav-logo">FLIBRY</a>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Поиск</a>
+                <a href="/library" class="nav-link">Библиотека</a>
+                <a href="/profile" class="nav-link active">Профиль</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container" style="padding-top: 120px; display: flex; justify-content: center;">
+        <div class="auth-card" style="width: 100%; max-width: 500px; text-align: center;">
+            <div style="font-size: 64px; margin-bottom: 16px;">👤</div>
+            <h1 style="font-size: 32px; margin-bottom: 8px;">Профиль</h1>
+            <p class="subtitle" style="margin-bottom: 32px;">Добро пожаловать, {{.User.Username}}!</p>
+            
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 24px; margin-bottom: 32px; text-align: left;">
+                <div style="margin-bottom: 20px;">
+                    <p style="color: rgba(255,255,255,0.5); font-size: 13px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px;">Логин</p>
+                    <p style="font-size: 18px; font-weight: 500; color: #fff;">{{.User.Username}}</p>
+                </div>
+                <div>
+                    <p style="color: rgba(255,255,255,0.5); font-size: 13px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px;">Дата регистрации</p>
+                    <p style="font-size: 18px; font-weight: 500; color: #fff;">{{.User.CreatedAt.Time.Format "02.01.2006"}}</p>
+                </div>
+            </div>
+
+            <button class="btn btn-secondary" 
+                    style="width: 100%; border-color: rgba(239, 68, 68, 0.3); color: #ef4444; font-size: 16px; padding: 16px;" 
+                    hx-post="/logout" 
+                    hx-swap="none" 
+                    onclick="setTimeout(() => window.location.href='/login', 200)">
+                Выйти из аккаунта
+            </button>
+        </div>
+    </div>
+</body>
+</html>

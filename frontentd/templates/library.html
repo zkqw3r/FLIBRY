@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLIBRY - Моя библиотека</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body>
+    <div class="background"></div>
+    
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="/" class="nav-logo">FLIBRY</a>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Поиск</a>
+                <a href="/library" class="nav-link active">Библиотека</a>
+                <a href="/profile" class="nav-link">Профиль</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container" style="padding-top: 120px;">
+        <div class="header" style="margin-bottom: 40px;">
+            <h1>Моя библиотека</h1>
+        </div>
+
+        <div class="results">
+            {{range .Books}}
+            <div class="book-card" id="book-{{.ID}}">
+                <div class="book-cover">
+                    <img src="/cover-by-id/{{.ID}}" alt="{{.Title}}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 200 300%27%3E%3Cdefs%3E%3ClinearGradient id=%27g%27 x1=%270%25%27 y1=%270%25%27 x2=%27100%25%27 y2=%27100%25%27%3E%3Cstop offset=%270%25%27 style=%27stop-color:%23181818%27/%3E%3Cstop offset=%27100%25%27 style=%27stop-color:%230a0a0a%27/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=%27200%27 height=%27300%27 fill=%27url(%23g)%27/%3E%3Crect x=%2770%27 y=%27120%27 width=%2760%27 height=%2780%27 rx=%274%27 fill=%27rgba(255,255,255,0.05)%27/%3E%3Crect x=%2775%27 y=%27125%27 width=%2750%27 height=%273%27 fill=%27rgba(255,255,255,0.1)%27/%3E%3Crect x=%2775%27 y=%27132%27 width=%2750%27 height=%273%27 fill=%27rgba(255,255,255,0.1)%27/%3E%3Crect x=%2775%27 y=%27139%27 width=%2735%27 height=%273%27 fill=%27rgba(255,255,255,0.1)%27/%3E%3C/svg%3E'">
+                </div>
+                <div class="book-title">{{.Title}}</div>
+                <div class="book-author">{{.Author.String}}</div>
+                
+                <div style="padding: 0 20px 12px; color: #4ade80; font-size: 14px; font-weight: 600;">
+                    Прочитано: {{.ProgressPercent.Int32}}%
+                </div>
+
+                <div class="book-actions">
+                    <a href="/reader/{{.ID}}" class="btn btn-primary action-read">Читать</a>
+                    <button class="btn btn-secondary" style="border-color: rgba(239, 68, 68, 0.3); color: #ef4444;" 
+                            hx-post="/api/library/{{.ID}}/toggle" 
+                            hx-target="#book-{{.ID}}" 
+                            hx-swap="delete">
+                        Удалить
+                    </button>
+                </div>
+            </div>
+            {{else}}
+            <div class="empty-state" style="grid-column: 1 / -1;">
+                <div class="empty-state-icon">📚</div>
+                <div class="empty-state-text">Ваша библиотека пока пуста</div>
+                <a href="/" class="btn btn-primary" style="display: inline-block; margin-top: 20px; padding: 12px 24px;">Найти книги</a>
+            </div>
+            {{end}}
+        </div>
+    </div>
+</body>
+</html>
