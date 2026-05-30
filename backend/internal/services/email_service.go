@@ -88,7 +88,7 @@ func NewEmailService(credentialsPath string) (*EmailService, error) {
 
 func (s *EmailService) SendVerificationEmail(to, token string) error {
 	verificationLink := fmt.Sprintf("http://localhost:8080/verify?token=%s", token)
-	subject := "Flibusta Registration Confirmation"
+	subject := "FLIBRY Registration Confirmation"
 	body := fmt.Sprintf("Welcome!\n\nPlease follow the link to confirm your registration:\n%s\n", verificationLink)
 
 	var message strings.Builder
