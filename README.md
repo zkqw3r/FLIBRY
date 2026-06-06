@@ -11,7 +11,7 @@
 </p>
 
 <div align="center">
-  <img src="demonstration.gif" width="60%"></img>
+  <img src="demonstration.gif" width="90%"></img>
   <p><i>demonstration of work</i></p>
 </div>
 
